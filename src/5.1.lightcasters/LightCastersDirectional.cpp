@@ -1,4 +1,4 @@
-// LightingMapsSpecular.cpp : Defines the entry point for the console application.
+// LightCaster.cpp : Defines the entry point for the console application.
 
 #include <iostream>
 
@@ -66,6 +66,19 @@ void do_movement();
 		-0.5f,	0.5f, -0.5f,  0.0f,	 1.0f,	0.0f,  0.0f,  1.0f
 };
 
+ glm::vec3 cubePositions[] = {
+	 glm::vec3(0.0f,  0.0f,  0.0f),
+	 glm::vec3(2.0f,  5.0f, -15.0f),
+	 glm::vec3(-1.5f, -2.2f, -2.5f),
+	 glm::vec3(-3.8f, -2.0f, -12.3f),
+	 glm::vec3(2.4f, -0.4f, -3.5f),
+	 glm::vec3(-1.7f,  3.0f, -7.5f),
+	 glm::vec3(1.3f, -2.0f, -2.5f),
+	 glm::vec3(1.5f,  2.0f, -2.5f),
+	 glm::vec3(1.5f,  0.2f, -1.5f),
+	 glm::vec3(-1.3f,  1.0f, -1.5f)
+ };
+
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 Camera camera = Camera(cameraPos);
 bool keys[1024];
@@ -75,8 +88,7 @@ const float WIDTH = 800, HEIGHT = 600;
 
 static float Fov = 45.0f;
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-
+glm::vec3 lightDirection(-0.2f, -1.0f, -0.3f);
 
 int main()
 {
@@ -85,7 +97,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Lighting Maps Exercise 3", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Light Casters", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
 	if (window == NULL)
@@ -112,15 +124,14 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Init my shader
-	Shader lightingShader(".\\Resource\\LightingMapsEx4.vs", ".\\Resource\\LightingMapsEx4.fs");
+	Shader lightingShader(".\\Resource\\LightCasters.vs", ".\\Resource\\LightCasters.fs");
 
-	Shader lamp(".\\Resource\\lamp.vs", ".\\Resource\\lamp.fs");
 	// Load Image
 	int width, height, nrComponents;
 	stbi_set_flip_vertically_on_load(1);
 	unsigned char* image = stbi_load(".\\Resource\\container2.png", &width, &height, &nrComponents, 0);
 
-	GLuint diffuseMap, specularMap, emission;
+	GLuint diffuseMap, specularMap;
 	glGenTextures(1, &diffuseMap);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
@@ -137,25 +148,6 @@ int main()
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(image);
-
-	stbi_set_flip_vertically_on_load(1);
-	image = stbi_load(".\\Resource\\matrix.jpg", &width, &height, &nrComponents, 0);
-
-	GLenum format;
-	if (nrComponents == 1)
-		format = GL_RED;
-	else if (nrComponents == 3)
-		format = GL_RGB;
-	else if (nrComponents == 4)
-		format = GL_RGBA;
-
-	glGenTextures(1, &emission);
-	glBindTexture(GL_TEXTURE_2D, emission);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(image);
-
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 
@@ -196,7 +188,6 @@ int main()
 	lightingShader.Use();
 	lightingShader.setInt("material.diffuse", 0);
 	lightingShader.setInt("material.specular", 1);
-	lightingShader.setInt("material.emission", 2);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -220,10 +211,10 @@ int main()
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("projection", projection);
 
-		lightingShader.setVec3("light.position", lightPos);
+		lightingShader.setVec3("light.direction", lightDirection);
 		lightingShader.setVec3("viewPos", camera.cameraPos);
 
-		lightingShader.setFloat("material.shininess", 64.0f);
+		lightingShader.setFloat("material.shininess", 32.0f);
 
 		glm::vec3 ambientColor = glm::vec3(0.2f);
 		glm::vec3 diffuseColor = glm::vec3(0.5f);
@@ -240,27 +231,18 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, emission);
-
 		glBindVertexArray(containerVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-
-		lamp.Use();
-		model = glm::mat4();
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-
-		lamp.setMat4("model", model);
-		lamp.setMat4("view", view);
-		lamp.setMat4("projection", projection);
-
-		// Draw the lamp object
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			// calculate the model matrix for each object and pass it to shader before drawing
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			angle = glfwGetTime() * 25.0f;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+			lightingShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 		glfwSwapBuffers(window);
 
 	}
