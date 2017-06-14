@@ -72,11 +72,11 @@ Camera camera = Camera(cameraPos);
 bool keys[1024];
 
 // Window dimensions
-const float WIDTH = 800, HEIGHT = 800;
+const float WIDTH = 800, HEIGHT = 600;
 
 static float Fov = 45.0f;
 
-glm::vec3 lightPos(0.6f, -0.2f, -0.5f);
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 
 int main()
@@ -167,7 +167,7 @@ int main()
 
 		view = camera.GetViewMatrix();
 
-		projection = glm::perspective(Fov, (GLfloat)(WIDTH / HEIGHT), 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(Fov), (GLfloat)(WIDTH / HEIGHT), 0.1f, 100.0f);
 
 		lightingShader.setMat4("model", model);
 
