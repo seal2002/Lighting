@@ -30,6 +30,8 @@ set(DEMO
 	4.2.lightingmapsspecularmap
 	4.3.lightingmapsEx3
 	4.4.lightingmapsEx4
+	5.1.lightcastersdirectional
+	5.2.lightcasterspoint
 )
 
 # then create a project file per tutorial

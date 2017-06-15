@@ -1,4 +1,4 @@
-// LightCaster.cpp : Defines the entry point for the console application.
+// LightCasterPoint.cpp : Defines the entry point for the console application.
 
 #include <iostream>
 
@@ -88,7 +88,7 @@ const float WIDTH = 800, HEIGHT = 600;
 
 static float Fov = 45.0f;
 
-glm::vec3 lightDirection(-0.2f, -1.0f, -0.3f);
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main()
 {
@@ -97,7 +97,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Light Casters", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Light Casters Point", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
 	if (window == NULL)
@@ -124,7 +124,9 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Init my shader
-	Shader lightingShader(".\\Resource\\LightCasters.vs", ".\\Resource\\LightCasters.fs");
+	Shader lightingShader(".\\Resource\\LightCastersPoint.vs", ".\\Resource\\LightCastersPoint.fs");
+
+	Shader lamp(".\\Resource\\lamp.vs", ".\\Resource\\lamp.fs");
 
 	// Load Image
 	int width, height, nrComponents;
@@ -211,7 +213,7 @@ int main()
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("projection", projection);
 
-		lightingShader.setVec3("light.direction", lightDirection);
+		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", camera.cameraPos);
 
 		lightingShader.setFloat("material.shininess", 32.0f);
@@ -223,6 +225,9 @@ int main()
 		lightingShader.setVec3("light.ambient", ambientColor);
 		lightingShader.setVec3("light.diffuse", diffuseColor);
 		lightingShader.setVec3("light.specular", sepecularColor);
+		lightingShader.setFloat("light.constant", 1.0f);
+		lightingShader.setFloat("light.linear", 0.09f);
+		lightingShader.setFloat("light.quadratic", 0.032f);
 
 		// bind diffuse map
 		glActiveTexture(GL_TEXTURE0);
@@ -243,6 +248,20 @@ int main()
 			lightingShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+		glBindVertexArray(0);
+
+		lamp.Use();
+		model = glm::mat4();
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+
+		lamp.setMat4("model", model);
+		lamp.setMat4("view", view);
+		lamp.setMat4("projection", projection);
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+
 		glfwSwapBuffers(window);
 
 	}
