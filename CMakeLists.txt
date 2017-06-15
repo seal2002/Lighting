@@ -18,22 +18,23 @@ set(LIBS ${LIBS} GLAD)
 
 set(DEMO
 	1.colors
-	2.1.basiclightingdiffuse
-	2.2.basiclightingspecular
-	2.3.basiclightingEx1
-	2.4.basiclightingEx3
-	2.5.basiclightingEx4
+	2.1.basic_lighting_diffuse
+	2.2.basic_lighting_specular
+	2.3.basic_lighting_Ex1
+	2.4.basic_lighting_Ex3
+	2.5.basic_lighting_Ex4
 	3.1.materials
-	3.2.materialslight
-	3.3.materialsEx1
-	4.1.lightingmapsdiffusemap
-	4.2.lightingmapsspecularmap
-	4.3.lightingmapsEx3
-	4.4.lightingmapsEx4
-	5.1.lightcastersdirectional
-	5.2.lightcasterspoint
-	5.3.lightcastersspot
-	5.4.lightcastersspotsoft
+	3.2.materials_light
+	3.3.materials_Ex1
+	4.1.lighting_maps_diffusemap
+	4.2.lighting_maps_specularmap
+	4.3.lighting_maps_Ex3
+	4.4.lighting_maps_Ex4
+	5.1.light_casters_directional
+	5.2.light_casters_point
+	5.3.light_casters_spot
+	5.4.light_casters_spot_soft
+	6.multiple_lights
 )
 
 # then create a project file per tutorial
