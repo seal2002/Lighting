@@ -33,6 +33,7 @@ set(DEMO
 	5.1.lightcastersdirectional
 	5.2.lightcasterspoint
 	5.3.lightcastersspot
+	5.4.lightcastersspotsoft
 )
 
 # then create a project file per tutorial
