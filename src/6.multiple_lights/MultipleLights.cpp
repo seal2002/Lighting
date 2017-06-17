@@ -4,6 +4,8 @@
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
 
+#include "stb_image.h"
+
 #include "Shader.h"
 #include "Camera.h"
 // Window dimensions
@@ -97,6 +99,20 @@ void main()
 
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
+
+	// Enable Depth Test
+	glEnable(GL_DEPTH_TEST);
+
+	//Init my shader
+	Shader lightingShader(".\\Resource\\MultiLights.vs", ".\\Resource\\Mutilights.fs");
+
+	//Load image
+	GLuint containerTex, specularMap;
+	int width, height, nrComponents;
+	stbi_set_flip_vertically_on_load(1);
+	unsigned char* image = stbi_load(".\\Resource\\container2.png", &width, &height, &nrComponents, 0);
+	glGenTextures(1, &containerTex);
+	glBindTexture(GL_TEXTURE_2D, containerTex);
 
 	while (!glfwWindowShouldClose(window))
 	{
