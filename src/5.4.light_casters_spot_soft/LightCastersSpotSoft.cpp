@@ -16,6 +16,7 @@
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void do_movement();
+unsigned int loadTexture(const char* imageName);
 
 // Square
  float vertices[] = {
@@ -122,27 +123,10 @@ int main()
 	Shader lightingShader(".\\Resource\\LightCastersSpotSoft.vs", ".\\Resource\\LightCastersSpotSoft.fs");
 
 	// Load Image
-	int width, height, nrComponents;
-	stbi_set_flip_vertically_on_load(1);
-	unsigned char* image = stbi_load(".\\Resource\\container2.png", &width, &height, &nrComponents, 0);
-
 	GLuint diffuseMap, specularMap;
-	glGenTextures(1, &diffuseMap);
-	glBindTexture(GL_TEXTURE_2D, diffuseMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
+	diffuseMap = loadTexture(".\\Resource\\container2.png");
+	specularMap = loadTexture(".\\Resource\\container2_specular.png");
 
-	stbi_image_free(image);
-
-	stbi_set_flip_vertically_on_load(1);
-	image = stbi_load(".\\Resource\\container2_specular.png", &width, &height, &nrComponents, 0);
-
-	glGenTextures(1, &specularMap);
-	glBindTexture(GL_TEXTURE_2D, specularMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(image);
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 
@@ -296,4 +280,26 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+}
+
+unsigned int loadTexture(const char * imageName)
+{
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	stbi_set_flip_vertically_on_load(1);
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load(imageName, &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+		texture = -1;
+	}
+	stbi_image_free(data);
+	return texture;
 }
