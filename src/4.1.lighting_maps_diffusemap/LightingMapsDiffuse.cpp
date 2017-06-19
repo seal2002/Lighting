@@ -7,9 +7,6 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <stb_image.h>
 #include "Shader.h"
@@ -162,7 +159,7 @@ int main()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 
-	//lightingShader.setInt("material.diffuse", 0);
+	lightingShader.setInt("material.diffuse", 0);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -194,7 +191,7 @@ int main()
 
 		glm::vec3 ambientColor = glm::vec3(0.2f);
 		glm::vec3 diffuseColor = glm::vec3(0.5f);
-		
+
 		lightingShader.setVec3("light.ambient", ambientColor);
 		lightingShader.setVec3("light.diffuse", diffuseColor);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);

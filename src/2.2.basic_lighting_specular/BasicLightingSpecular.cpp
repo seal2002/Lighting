@@ -170,20 +170,14 @@ int main()
 		projection = glm::perspective(glm::radians(Fov), (GLfloat)(WIDTH / HEIGHT), 0.1f, 100.0f);
 
 		lightingShader.setMat4("model", model);
-
 		lightingShader.setMat4("view", view);
+		lightingShader.setMat4("projection", projection);
 
 		lightingShader.setVec3("viewPos", camera.cameraPos);
 
-		GLint projectionLoc = glGetUniformLocation(lightingShader.Program, "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");
-		GLint lightColorLoc = glGetUniformLocation(lightingShader.Program, "lightColor");
-		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
-		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
-		glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f); // Also set light's color (white)
+		lightingShader.setVec3("lightPos", lightPos);
+		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);  // Also set light's color (white)
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -195,11 +189,8 @@ int main()
 		model = glm::scale(model, glm::vec3(0.2f));
 
 		lamp.setMat4("model", model);
-
 		lamp.setMat4("view", view);
-
-		projectionLoc = glGetUniformLocation(lamp.Program, "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		lamp.setMat4("projection", projection);
 
 		// Draw the lamp object
 		glBindVertexArray(lightVAO);
